@@ -1,53 +1,58 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>NZ Legislation Search Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
+<html>
 <body>
-  <h1>NZ Legislation Search Demo</h1>
 
-  <form id="search-form">
-    <input id="search-term" value="space" />
-    <button type="submit">Search</button>
-  </form>
+<h1>NZ Legislation Search Demo</h1>
 
-  <p id="status">Enter a search term.</p>
+<form id="search-form">
+  <input id="search-term" value="space">
+  <button type="submit">Search</button>
+</form>
 
-  <script>
-    const API_BASE = "https://withered-king-3fd4.andy-hkn.workers.dev/";
+<p id="status">Ready.</p>
 
-    document.getElementById("search-form").addEventListener("submit", async (event) => {
-      event.preventDefault();
+<script>
+const API_BASE =
+  "https://withered-king-3fd4.andy-hkn.workers.dev/";
 
-      const term = document.getElementById("search-term").value.trim();
-      const status = document.getElementById("status");
+document
+  .getElementById("search-form")
+  .addEventListener("submit", async (event) => {
 
-      if (!term) {
-        status.textContent = "Please enter a search term.";
-        return;
-      }
+    event.preventDefault();
+
+    const term =
+      document.getElementById("search-term").value;
+
+    const status =
+      document.getElementById("status");
+
+    status.textContent = "Searching...";
+
+    try {
 
       const url = new URL(API_BASE);
+
       url.searchParams.set("search_term", term);
       url.searchParams.set("search_field", "content");
       url.searchParams.set("per_page", "20");
 
-      status.textContent = "Searching...";
+      const response = await fetch(url);
 
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`API returned ${response.status}`);
-        }
+      const data = await response.json();
 
-        const data = await response.json();
-        status.textContent = `Found ${data.total} results for "${term}".`;
-      } catch (error) {
-        status.textContent = `Search failed: ${error.message}`;
-      }
-    });
-  </script>
+      status.textContent =
+        `Found ${data.total} results`;
+
+    } catch (error) {
+
+      status.textContent =
+        `Failed: ${error.message}`;
+
+      console.error(error);
+    }
+});
+</script>
+
 </body>
 </html>
